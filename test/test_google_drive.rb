@@ -316,6 +316,28 @@ class TestGoogleDrive < Test::Unit::TestCase
     delete_test_file(file, true)
   end
 
+  def test_acl_allow_file_discovery
+    session = get_session
+
+    test_file_title = "#{PREFIX}acl-test-file"
+
+    # Removes test files/collections in the previous run in case the previous run failed.
+    for file in session.files('title' => test_file_title, 'title-exact' => 'true')
+      delete_test_file(file, true)
+    end
+
+    file = session.upload_from_string('hoge', test_file_title, content_type: 'text/plain', convert: false)
+    file.acl.push({ scope_type: 'anyone', allow_file_discovery: false, role: 'reader' })
+    acl = file.acl(reload: true)
+
+    assert { acl[1].scope_type == 'anyone' }
+    assert { acl[1].with_key }
+    assert { acl[1].role == 'reader' }
+    assert { acl[1].value.nil? }
+
+    delete_test_file(file, true)
+  end
+
   def get_session
     unless @@session
       puts("\nThis test will create files/spreadsheets/collections with your account,")

@@ -153,6 +153,8 @@ module GoogleDrive
           new_params[:value] = v
         when 'with_key', 'withLink'
           new_params[:allow_file_discovery] = !v
+        when 'allow_file_discovery'
+          new_params[:allow_file_discovery] = v
         when 'value'
           value = v
         else
